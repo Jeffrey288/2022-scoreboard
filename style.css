@@ -1,0 +1,94 @@
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+
+.round-section {
+  @apply flex flex-col w-[40%];
+}
+
+.criteria-text {
+  @apply text-size-[20px] font-bold text-center;
+  font-variant: small-caps;
+}
+
+.restart-vio-button {
+  @apply text-size-[20px] px-4 py-[2px] min-w-25 min-h-[30px] rounded-[11px] bg-purple-300 hover:bg-purple-200 <lg:(min-w-18 text-size-[16px] px-1);
+}
+.restart-vio-text {
+  @apply text-size-[24px] font-bold;
+}
+.end-button {
+  @apply w-[35%] rounded-[11px] text-white text-size-[25px] bg-purple-500 border-purple-900 border-[3px] hover:bg-purple-400;
+}
+
+.criteria-button {
+  @apply text-white text-size-[20px] px-2 py-[2px] w-[80%] min-w-17 min-h-[30px] rounded-[11px] <lg:min-w-11;
+}
+.ok, .green-btn{
+  @apply criteria-button bg-green-500 hover:bg-green-400;
+}
+.fail, .red-btn{
+  @apply criteria-button bg-red-500 hover:bg-red-400;
+}
+
+
+.ball {
+ @apply my-[4px] flex justify-center items-center rounded-[50%] w-[45px] h-[45px] pb-1 border-green-600 border-width-[2px] text-center text-size-[25px];
+}
+.ball-unclicked {
+  @apply ball hover:border-width-[3px] hover:border-green-800;
+}
+.ball-clicked {
+  @apply ball-unclicked bg-emerald-200 hover:border-width-[3px] hover:border-green-800;
+}
+
+.eventboard {@apply flex flex-col rounded-[11px] w-[40%]; min-height:20vh; max-height: 20vh; overflow: overlay;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 5px;
+  border-radius: 11px;
+  background-clip: padding-box;  
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(90, 90, 90, 0.4);
+  border-radius: 11px;
+  background-clip: padding-box;  
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 11px;
+  background-clip: padding-box;  
+}
+
+div.record {@apply flex flex-row w-[100%];}
+div.sbheader {@apply flex flex-row w-[100%] h-8 font-bold;}
+div.placeholder {@apply flex flex-row w-[100%] flex-1;}
+div.record:hover {background-color: rgba(255,255,255,.2);}
+div.sbheader span {@apply text-size-17px py-1.5 px-2; border-bottom: solid 1.7px;}
+div.record span, div.placeholder span {@apply text-size-15px py-1.5 px-2;}
+.record span:nth-of-type(1), .sbheader span:nth-of-type(1), .placeholder span:nth-of-type(1) {width:22.66%;  @apply text-center;}
+.record span:nth-of-type(2), .sbheader span:nth-of-type(2), .placeholder span:nth-of-type(2) {width:70.66%; background: rgba(255, 255, 255, 0.3);} 
+.record span:nth-of-type(3), .placeholder span:nth-of-type(3), .sbheader span:nth-of-type(3) {width:16.66%; max-width:16.66%; min-width:16.66%; @apply text-center pl-2 pr-10;}  
+ /* {width:16.66%; @apply text-left pl-2;}   */
+
+.icon-button {
+  @apply bg-emerald-600 text-light-50 text-size-[20px] py-2 px-3 w-[100%] rounded-xl flex flex-row justify-center
+}
+
+.collapsible {
+  cursor: pointer;
+}
+.collapsible-content {
+  @apply active;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.15s ease-out;
+}
