@@ -154,3 +154,105 @@ div.record span, div.placeholder span {@apply text-size-15px py-1.5 px-2;}
   max-height: 0;
   transition: max-height 0.15s ease-out;
 }
+
+
+
+
+/*  windicss stuff  */
+
+.block {
+  display: block;
+}
+.inline-block {
+  display: inline-block;
+}
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+.flex-row {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+}
+.flex-col {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+.items-center {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+.justify-center {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+.justify-between {
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+}
+.float-right {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+.font-bold {
+  font-weight: 700;
+}
+.text-size-\[40px\] {
+  font-size: 40px;
+  line-height: 1;
+}
+.m-auto {
+  margin: auto;
+}
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.pointer-events-none {
+  pointer-events: none;
+}
+.text-center {
+  text-align: center;
+}
+.underline {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+}
+.w-\[84\%\] {
+  width: 84%;
+}
+.w-\[55\%\] {
+  width: 55%;
+}
+.w-\[35\%\] {
+  width: 35%;
+}
+.w-\[100\%\] {
+  width: 100%;
+}
+.w-\[19\%\] {
+  width: 19%;
+}
+.w-\[27\%\] {
+  width: 27%;
+}
