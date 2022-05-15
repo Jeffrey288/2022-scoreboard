@@ -44,6 +44,14 @@ const game_stats = {
   },
 };
 
+function updateRecord() {
+  ["red", "blue"].forEach((team) => 
+    {
+      var score = game_stats[team].counters.seekerScore();
+      scoreboards[team].scoreboard.innerText = score;
+    }
+  )
+}
 function addRecord(team, action) {
 
   var timecode = "", time = "";
@@ -69,7 +77,7 @@ function addRecord(team, action) {
     = record.toHTML() + scoreboards[team].eventboard.innerHTML;
   game_stats[team].records.push(record);
 
-  scoreboards[team].scoreboard.innerText = score;
+  updateRecord();
 
 }
 
@@ -170,6 +178,7 @@ function lagori_buttons_update() {
         break;
     }
   })
+  updateRecord();
 }
 function lagori_select_callback(btn) {
   var [team, lagoriChar, action, _] = btn.id.split("-"); var lagori = lagori2index(lagoriChar);
@@ -470,7 +479,7 @@ function timer_loop() {
   // displaying the timer
   if (game_state === STATES.end) {
     timer_text.innerHTML = "GAME OVER";
-    timer_text.classList.replace("text-size-[90px]", "text-size-[70px]");
+    timer_text.classList.replace("text-size-[90px]", "text-size-[60px]");
     timer_start.classList.replace("timer-active", "timer-inactive");
     timer_stop.classList.replace("timer-active", "timer-inactive");
     timer_reset.classList.replace("timer-inactive", "timer-active");
@@ -508,6 +517,10 @@ function timer_loop() {
       set_state_board("r1-break", false); set_state_board("r1-build", true);
     }
   } else if (game_state === STATES.r1_build) {
+    if (timer.time_up() < 10*1000) {
+      timer_text.classList.add("flash");
+    }
+
     if (
       timer.time_up() || // 1. time runs out
       counters[ROLES.r1.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5 || // 2. lagori tower complete
@@ -519,6 +532,7 @@ function timer_loop() {
       if (counters[ROLES.r1.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5)
         built_indicators[ROLES.r1.seeker].classList.replace("end-button", "end-button-lit");
 
+      timer_text.classList.add("flash");
       var time_left = timer.get_time_left();
       // store this time_left somewhere
       timer.reinit(ONEMIN);
@@ -549,6 +563,10 @@ function timer_loop() {
       set_state_board("r2-break", false); set_state_board("r2-build", true);
     }
   } else if (game_state === STATES.r2_build) {
+    if (timer.time_up() < 10*1000) {
+      timer_text.classList.add("flash");
+    }
+
     if (
       timer.time_up() || // 1. time runs out
       counters[ROLES.r2.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5 || // 2. lagori tower complete

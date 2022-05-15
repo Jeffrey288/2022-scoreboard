@@ -7,6 +7,35 @@
   margin-top: 60px;
 }
 
+.timer {
+  @apply text-red-800 text-size-[90px] text-center;
+}
+.flash {
+  animation-name: flash-animation;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+@keyframes flash-animation {
+  0%  {color: rgb(153 27 27);}
+  33% {color: rgb(165 165 165)};
+  66% {color: black};
+  100%  {	color: rgb(153 27 27);}
+}
+/* .flash {
+  animation-name: flash-animation;
+  animation-duration: 0.1s;
+  animation-iteration-count: infinite;
+}
+@keyframes flash-animation {
+  0%  {color: rgb(153 27 27);}
+  14% {color: orange;}
+  28% {color: yellow;}
+  42% {color: green;}
+  56% {color: lime;}
+  70% {color: blue;}
+  84% {color: purple;}
+  100%  {	color: rgb(153 27 27);}
+} */
 .timer-active {
   @apply pointer-events-auto font-semibold;
 }
