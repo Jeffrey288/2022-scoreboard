@@ -26,7 +26,7 @@ function seeker_score_template(id) {
             </td>
             </tr>
         </table>
-        <button id="${id+"seeker-complete-btn"}" class="end-button pointer-events-none">BUILT</button>
+        <button id="${id+"seeker-complete-btn"}" class="w-[35%] end-button pointer-events-none">BUILT</button>
         </div>
         
         <div class="flex flex-row my-3">
@@ -116,7 +116,7 @@ function hitter_score_template(id) {
 
     <table class="text-center items-center w-[100%] >lg:table-fixed">
         <tr>
-        <td rowspan="3" class="w-[19%]">
+        <td rowspan="3" class="w-[19%]"> 
             <p class="criteria-text">Balls</p>
             <div class="ball m-auto my-3"></div>
         </td>
