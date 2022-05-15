@@ -1,61 +1,82 @@
 class Timer {
-  constructor() {
-    this.isRunning = false;
-    this.startTime = 0;
-    this.overallTime = 0;
+
+  constructor(timeTarget = undefined) {
+    this.reinit(this.timeTarget);
   }
 
-  _getTimeElapsedSinceLastStart() {
-    if (!this.startTime) {
-      return 0;
+  reinit(timeTarget = undefined) {
+    this.timeTarget = timeTarget;
+    this.isRunning = false;
+    this.startTime = 0;
+    this.cumulatedTime = 0;
+    this.totalTime = 0;
+    if (timeTarget == undefined) {
+      this.countUp = true;
+    } else {
+      this.countUp = false;
     }
+  }
 
-    return Date.now() - this.startTime;
+  _getTimeElasped() {
+    if (this.isRunning) {
+      this.totalTime = Date.now() - this.startTime + this.cumulatedTime;
+    }
+    return this.totalTime;
+  }
+
+  _getTimeRemaining() {
+    if (this.countUp) return undefined;
+    const remTime = this.timeTarget - this._getTimeElasped();
+    if (remTime < 0)
+      return 0;
+    return remTime;
+  }
+  
+  get_time_elapsed() { 
+    return this._getTimeElasped();
+  }
+
+  get_time_left() {
+    return this._getTimeRemaining();
+  }
+
+  is_running() {
+    return this.isRunning;
+  }
+
+  time_up() {
+    if (this._getTimeElasped() > this.timeTarget) {
+      return true;
+    } return false;
   }
 
   start() {
-    if (this.isRunning) {
-      //   return console.error("Timer is already running");
-      return;
+    if (!this.isRunning) {
+      this.startTime = Date.now();
     }
-
     this.isRunning = true;
-
-    this.startTime = Date.now();
   }
 
   stop() {
-    if (!this.isRunning) {
-      //   return console.error("Timer is already stopped");
-      return;
+    if (this.isRunning) {
+      this.cumulatedTime += Date.now() - this.startTime;
     }
-
     this.isRunning = false;
-
-    this.overallTime = this.overallTime + this._getTimeElapsedSinceLastStart();
   }
 
-  reset() {
-    this.overallTime = 0;
-
-    if (this.isRunning) {
-      this.startTime = Date.now();
-      return;
-    }
-
-    this.startTime = 0;
+  get_ms_string() {
+    if (this.countUp) return Timer.ms2msStr(this._getTimeElasped());
+    return Timer.ms2msStr(this._getTimeRemaining());
   }
 
-  getTime() {
-    if (!this.startTime) {
-      return 0;
-    }
+  get_s_string() {
+    if (this.countUp) return Timer.ms2secStr(this._getTimeElasped());
+    return Timer.ms2secStr(this._getTimeRemaining());
+  }
 
-    if (this.isRunning) {
-      return this.overallTime + this._getTimeElapsedSinceLastStart();
-    }
-
-    return this.overallTime;
+  get_ms_s_string() {
+    if (this.countUp) return Timer.ms2mssecStr(this._getTimeElasped());
+    return Timer.ms2mssecStr(this._getTimeRemaining());
   }
 
   static ms2msStr(ms) {
@@ -69,6 +90,13 @@ class Timer {
     const sec = String(Math.floor(ms / 1000)).padStart(2, '0');
     return sec;
   }
+  
+  static ms2mssecStr(ms) {
+    const sec = String(Math.floor(ms / 1000));
+    const decisec = String(ms % 1000).padStart(3, '0').slice(0, 1);
+    return `${sec}.${decisec}`;
+  }
+
 
 }
 

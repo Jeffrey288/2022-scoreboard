@@ -7,6 +7,27 @@
   margin-top: 60px;
 }
 
+.timer-active {
+  @apply pointer-events-auto font-semibold;
+}
+.timer-inactive {
+  @apply pointer-events-none text-gray-400;
+}
+
+.board {
+  transition: background-color cubic-bezier(0, 0.01, 0.2, 1) 2s;
+}
+.board-inactive {
+  @apply board border-blue-500 border-width-[1px] bg-blue-200 text-center pointer-events-none;
+} 
+.board-active {
+  @apply board border-yellow-600 border-width-[2px] bg-yellow-300 text-center pointer-events-auto;
+} 
+.board-active button {
+  @apply hover:(bg-yellow-200 table text-center border-none w-[100%] h-[100%] my-auto);
+}
+
+
 .round-section {
   @apply flex flex-col w-[40%];
 }
@@ -22,8 +43,12 @@
 .restart-vio-text {
   @apply text-size-[24px] font-bold;
 }
+
 .end-button {
   @apply w-[35%] rounded-[11px] text-white text-size-[25px] bg-purple-500 border-purple-900 border-[3px] hover:bg-purple-400;
+}
+.end-button-lit {
+  @apply w-[35%] rounded-[11px] text-white text-size-[25px] font-bold bg-yellow-400 border-orange-700 border-[3px] pointer-events-none;
 }
 
 .criteria-button {
@@ -35,6 +60,10 @@
 .fail, .red-btn{
   @apply criteria-button bg-red-500 hover:bg-red-400;
 }
+.disabled, .gray-btn{
+  @apply criteria-button bg-gray-500 pointer-events-none;
+}
+
 
 
 .ball {
@@ -45,6 +74,10 @@
 }
 .ball-clicked {
   @apply ball-unclicked bg-emerald-200 hover:border-width-[3px] hover:border-green-800;
+}
+.ball-inactive {
+  @apply my-[4px] flex justify-center items-center rounded-[50%] w-[45px] h-[45px] pb-1 border-gray-400 border-width-[2px] 
+    text-center text-size-[25px] hover:border-width-[3px] pointer-events-none ;
 }
 
 .eventboard {@apply flex flex-col rounded-[11px] w-[40%]; min-height:20vh; max-height: 20vh; overflow: overlay;
@@ -69,10 +102,10 @@
 }
 
 div.record {@apply flex flex-row w-[100%];}
-div.sbheader {@apply flex flex-row w-[100%] h-8 font-bold;}
+div.sbheader {@apply flex flex-row w-[100%] h-8 font-bold <xl:h-8;}
 div.placeholder {@apply flex flex-row w-[100%] flex-1;}
 div.record:hover {background-color: rgba(255,255,255,.2);}
-div.sbheader span {@apply text-size-17px py-1.5 px-2; border-bottom: solid 1.7px;}
+div.sbheader span {@apply text-size-[17px] py-2 px-2 <xl:(text-size-[15px] py-[1] px-2); border-bottom: solid 1.7px;}
 div.record span, div.placeholder span {@apply text-size-15px py-1.5 px-2;}
 .record span:nth-of-type(1), .sbheader span:nth-of-type(1), .placeholder span:nth-of-type(1) {width:22.66%;  @apply text-center;}
 .record span:nth-of-type(2), .sbheader span:nth-of-type(2), .placeholder span:nth-of-type(2) {width:70.66%; background: rgba(255, 255, 255, 0.3);} 
