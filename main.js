@@ -2,7 +2,7 @@ import './style.css'
 import 'virtual:windi.css'
 import Timer from './timer'
 import { seeker_score_template, hitter_score_template } from './templates'
-import { Counters, Record } from './records';
+import { Counters, Record, saveToJSON, toIsoString } from './records';
 import { type } from 'windicss/utils';
 
 const timer = new Timer();
@@ -350,6 +350,17 @@ function updateRestart(restart_id) {
   restart_btns_obj[restart_id].innerHTML = 
     restart_states[restart_id].timer.get_ms_s_string();
 }
+
+function endAllRestarts() {
+  restart_states.forEach(
+    (restart_id) => {
+      if (!(restart_states === undefined)) {
+        endRestart(restart_id);
+      }
+    }
+  );
+}
+
 restart_btns.forEach((btn) =>
   btn.addEventListener("mousedown", function(e) {
     if (game_state == STATES.start) return;
@@ -404,13 +415,18 @@ timer_start.addEventListener("click", function () {
   }
 
 });
-timer_stop.addEventListener("click", function() {
+
+const BREAK_PAUSE_GAME = true;
+function pause_game() {
   timer_start.innerText = "RESUME";
   timer_start.classList.replace("timer-inactive", "timer-active");
   timer_stop.classList.replace("timer-active", "timer-inactive");
   timer_reset.classList.replace("timer-inactive", "timer-active");
   game_paused = true;
   timer.stop();
+}
+timer_stop.addEventListener("click", function() {
+  pause_game();
 })
 timer_reset.addEventListener("click", function () {
   document.location.reload(true)
@@ -462,9 +478,9 @@ const BOARDS = {
   right: "red"
 };
 
+var place_times = [0, 0];
 var game_paused = true;
 var game_state = STATES.start;
-var timer_loop_id = undefined;
 function set_state_board(id, state) {
   if (state) { board_elm[id].classList.replace("board-inactive", "board-active"); } 
   else { board_elm[id].classList.replace("board-active", "board-inactive"); }
@@ -479,7 +495,7 @@ function timer_loop() {
   // displaying the timer
   if (game_state === STATES.end) {
     timer_text.innerHTML = "GAME OVER";
-    timer_text.classList.replace("text-size-[90px]", "text-size-[60px]");
+    timer_text.classList.add("text-size-[70px]");
     timer_start.classList.replace("timer-active", "timer-inactive");
     timer_stop.classList.replace("timer-active", "timer-inactive");
     timer_reset.classList.replace("timer-inactive", "timer-active");
@@ -511,13 +527,15 @@ function timer_loop() {
       ) {
       var time_left = timer.get_time_left(); // store this time_left somewhere
       counters[ROLES.r1.seeker].seeker.break_time = HALFMIN - time_left;
+      place_times[0] = ONEMIN + time_left
       timer.reinit(ONEMIN + time_left);
       timer.start();
+      if (BREAK_PAUSE_GAME) pause_game();
       game_state = STATES.r1_build;
       set_state_board("r1-break", false); set_state_board("r1-build", true);
     }
   } else if (game_state === STATES.r1_build) {
-    if (timer.time_up() < 10*1000) {
+    if (timer.get_time_left() < 10*1000) {
       timer_text.classList.add("flash");
     }
 
@@ -529,10 +547,12 @@ function timer_loop() {
       scoreboards.blue.role.innerHTML = toProperCase(ROLES.r2.blue);
       scoreboards.red.role.innerHTML = toProperCase(ROLES.r2.red);
   
-      if (counters[ROLES.r1.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5)
+      if (counters[ROLES.r1.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5) { // built
         built_indicators[ROLES.r1.seeker].classList.replace("end-button", "end-button-lit");
+        counters[ROLES.r1.seeker].seeker.built = true;
+      }
 
-      timer_text.classList.add("flash");
+      timer_text.classList.remove("flash");
       var time_left = timer.get_time_left();
       // store this time_left somewhere
       timer.reinit(ONEMIN);
@@ -556,14 +576,17 @@ function timer_loop() {
       counters[ROLES.r2.seeker].seeker.lagori_broken.filter((n)=>n>0).length == 5 // 3. all 3 lagoris broken
       ) {
       var time_left = timer.get_time_left();
+      counters[ROLES.r2.seeker].seeker.break_time = HALFMIN - time_left;
       // store this time_left somewhere
+      place_times[1] = ONEMIN + time_left;
       timer.reinit(ONEMIN + time_left);
       timer.start();
+      if (BREAK_PAUSE_GAME) pause_game();
       game_state = STATES.r2_build;
       set_state_board("r2-break", false); set_state_board("r2-build", true);
     }
   } else if (game_state === STATES.r2_build) {
-    if (timer.time_up() < 10*1000) {
+    if (timer.get_time_left() < 10*1000) {
       timer_text.classList.add("flash");
     }
 
@@ -572,15 +595,50 @@ function timer_loop() {
       counters[ROLES.r2.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5 || // 2. lagori tower complete
       counters[ROLES.r2.hitter].hitter.hit // 3. if hit
     ) {
-      if (counters[ROLES.r2.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5)
+      if (counters[ROLES.r2.seeker].seeker.lagori_placed.filter((n)=>n>0).length == 5) {
         built_indicators[ROLES.r2.seeker].classList.replace("end-button", "end-button-lit");
+        counters[ROLES.r2.seeker].seeker.built = true;
+      }
 
-      var time_left = timer.get_time_left();
       // store this time_left somewhere
+      var time_left = timer.get_time_left();
+      counters[ROLES.r2.seeker].seeker.time_remaining = time_left;
+      counters[ROLES.r2.hitter].hitter.time_remaining = time_left;
+      counters[ROLES.r2.seeker].seeker.place_time = 0;
+      
+
       game_state = STATES.end;
       set_state_board("r2-header", false); set_state_board("r2-build", false); 
     }
   }
 
 }
+
+function saveResult() {
+  const result = {
+      createdAt: toIsoString(new Date()),
+      data: {
+          red: {
+              score: game_stats.red.counters.seekerScore(),
+              seeker: game_stats.red.counters.seekerCompiled(),
+              hitter: game_stats.red.counters.hitterCompiled(),
+              records: game_stats.red.records.map((obj) => obj.toString()),
+              win: false,
+          },
+          blue: {
+            score: game_stats.blue.counters.seekerScore(),
+            seeker: game_stats.blue.counters.seekerCompiled(),
+            hitter: game_stats.blue.counters.hitterCompiled(),
+            records: game_stats.blue.records.map((obj) => obj.toString()),
+            win: false,  
+          },
+      },
+  };
+  saveToJSON(result, "result.json");
+}
+
+document.getElementById("btn_save").addEventListener("click", () => {
+  // alert("hi");
+  saveResult();
+})
 // let main_loop_id = setInterval(main_loop, 8);

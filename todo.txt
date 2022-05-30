@@ -1,0 +1,51 @@
+todo:
+- fix timer blinking when not needed (DONE)
+- fix build flag not changed
+- create template for new page
+- design all data outputted / summarized
+- i like ust (NO NEED)
+- restart seems to have some problems
+- load can be worked on later, for now just load a file (including drag and drop), then able to convert
+- violation drop down list
+- left right exchange
+
+
+this.hitter_counters = {
+          restarts: 0,
+          restart_times: [],
+          violations: 0,
+          violation_type: [],
+          hit: false,
+          balls_collected: 0,
+          balls_passed: 0,
+          balls_thrown: 0,
+          time_remaining: 0,
+};	
+
+whole game:
+- victory
+- first ball time
+- fourth ball time
+
+this.seeker_counters = {
+        restarts: 0,
+        restart_times: [],
+        violations: 0,
+        violation_type: [],
+        built: false,
+        balls_used: 0,
+        lagori_broken: [0, 0, 0, 0, 0],
+        lagori_picked: [false, false, false, false, false],
+        lagori_placed: [false, false, false, false, false],
+        break_time: 0,
+        place_time: 0,
+        time_remaining: 0,
+};
+- lagori broken by 1st, 2nd, 3rd ball
+- lagoris broken (total)
+- lagoris picked
+- lagoris placed
+- break time
+- place time
+- time remaining
+
