@@ -1,8 +1,8 @@
 todo:
 - fix timer blinking when not needed (DONE)
-- fix build flag not changed
-- create template for new page
-- design all data outputted / summarized
+- fix build flag not changed 
+- create template for new page (DONE)
+- design all data outputted / summarized (DONE)
 - i like ust (NO NEED)
 - restart seems to have some problems
 - load can be worked on later, for now just load a file (including drag and drop), then able to convert

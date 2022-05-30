@@ -128,12 +128,12 @@ function hitter_score_template(id) {
             <span id="${id+"thrown-counter"}" class="text-size-[40px] text-center font-bold block">0</span></td>
         </tr>
         <tr>
-        <td><button id="${id+"collected-plus"}" class="green-btn">+1</button></td>
+        <td><button id="${id+"collected-plus"}" class="green-btn">+3</button></td>
         <td><button id="${id+"passed-plus"}" class="green-btn">+1</button></td>
         <td><button id="${id+"thrown-plus"}" class="green-btn">+1</button></td>
         </tr>
         <tr>
-        <td><button id="${id+"collected-minus"}" class="red-btn">-1</button></td>
+        <td><button id="${id+"collected-minus"}" class="red-btn">-3</button></td>
         <td><button id="${id+"passed-minus"}" class="red-btn">-1</button></td>
         <td><button id="${id+"thrown-minus"}" class="red-btn">-1</button></td>
         </tr>

@@ -9,6 +9,7 @@ class Counters {
           violation_type: [],
           hit: false,
           balls_collected: 0,
+          balls_collected_time: [NaN, NaN],
           balls_passed: 0,
           balls_thrown: 0,
           time_remaining: 0,
@@ -25,7 +26,7 @@ class Counters {
         lagori_picked: [false, false, false, false, false],
         lagori_placed: [false, false, false, false, false],
         break_time: 0,
-        place_time: 0,
+        place_time: NaN,
         time_remaining: 0,
       };
 
@@ -68,11 +69,11 @@ class Record {
     }
 }
 
-function saveToJSON(obj, filename = "result.json") {
+function saveToJSON(json, filename = "result.json") {
     var a = document.createElement("a");
     a.setAttribute(
       "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(obj, null, 4))
+      "data:text/plain;charset=utf-8," + encodeURIComponent(json)
     );
     a.setAttribute("download", filename);
     a.click();

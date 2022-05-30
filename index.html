@@ -84,6 +84,13 @@
       </section>
 
     </header>
+    <div class="m-auto py-1">
+    <input type="checkbox" id="break_pause">
+    <label for="break_pause">Pause after Break</label>
+    <span class="px-3"></span>
+    <input type="checkbox" id="swap_colors">
+    <label for="swap_colors">Swap blue and red</label>
+    </div>
 
     
     <main class="flex flex-col items-stretch mx-8 w-[calc(100%-4rem)]">
@@ -142,6 +149,8 @@
         </div>
       </section>
       
+
+
       <button id="round-1-button" class="collapsible mt-5 bg-purple-200 border-dotted border-[2.5px] border-purple-900 text-center hover:bg-purple-300"> Round 1</button>
       <round-box id="round-1-content" class="collapsible-content">
         <div class="pb-2 pt-5 bg-purple-100">
@@ -179,6 +188,9 @@
         </div>
       </round-box>
     </main>
+
+    <div id="result_output">
+    </div>
 
     <button id='timer_start' class=""></button>
     <script type="module" src="/main.js"></script>

@@ -125,13 +125,28 @@ const hitter_score_buttons = selectIDs(hitter_score_buttons_ids);
 const hitter_score_counter = initObj(hitter_score_counter_ids, selectIDsOrdered(hitter_score_counter_ids));
 hitter_score_buttons.forEach((btn) => btn.addEventListener("click", function () {
   var [team, action, incrementText] = this.id.split("-");
-  var increment; if (incrementText == "plus") increment = 1; else increment = -1;
-  if ((increment == 1 && counters[team]["hitter"]["balls_"+action] < 6)
-    || (increment == -1 && counters[team]["hitter"]["balls_"+action] > 0)
-    && game_state != STATES.start) {
-      counters[team]["hitter"]["balls_"+action] += increment;
-      hitter_score_counter[`${team}-${action}-counter`].innerText = counters[team]["hitter"]["balls_"+action];
-      addRecord(team, `Balls ${action} ${incrementText} one, total ${counters[team]["hitter"]["balls_"+action]}.`);
+  if (action == "collected") {
+    var increment; if (incrementText == "plus") increment = 3; else increment = -3;
+    if ((increment == 3 && counters[team]["hitter"]["balls_"+action] < 6)
+      || (increment == -3 && counters[team]["hitter"]["balls_"+action] > 0)
+      && game_state != STATES.start) {
+        counters[team]["hitter"]["balls_"+action] += increment;
+        hitter_score_counter[`${team}-${action}-counter`].innerText = counters[team]["hitter"]["balls_"+action];
+        if (incrementText == "plus") {
+          if (counters[team]["hitter"]["balls_"+action] == 3) counters[team]["hitter"].balls_collected_time[0] = timer.get_s_string();
+          if (counters[team]["hitter"]["balls_"+action] == 6) counters[team]["hitter"].balls_collected_time[1] = timer.get_s_string();
+        }
+        addRecord(team, `Balls ${action} ${incrementText} three, total ${counters[team]["hitter"]["balls_"+action]}.`);
+    }
+  } else {
+    var increment; if (incrementText == "plus") increment = 1; else increment = -1;
+    if ((increment == 1 && counters[team]["hitter"]["balls_"+action] < 6)
+      || (increment == -1 && counters[team]["hitter"]["balls_"+action] > 0)
+      && game_state != STATES.start) {
+        counters[team]["hitter"]["balls_"+action] += increment;
+        hitter_score_counter[`${team}-${action}-counter`].innerText = counters[team]["hitter"]["balls_"+action];
+        addRecord(team, `Balls ${action} ${incrementText} one, total ${counters[team]["hitter"]["balls_"+action]}.`);
+    }
   }
   
 }));
@@ -400,6 +415,7 @@ hit_buttons.forEach(btn => btn.addEventListener("click", function () {
 }));
 
 // timer stuff
+var timer_loop_id = undefined;
 const timer_start = document.getElementById("timer-start");
 const timer_stop = document.querySelector("#timer-stop");
 const timer_reset = document.querySelector("#timer-reset");
@@ -416,7 +432,6 @@ timer_start.addEventListener("click", function () {
 
 });
 
-const BREAK_PAUSE_GAME = true;
 function pause_game() {
   timer_start.innerText = "RESUME";
   timer_start.classList.replace("timer-inactive", "timer-active");
@@ -455,8 +470,16 @@ board_btns.forEach((btn) => btn.addEventListener("click", function() {
   if (id == game_state && timer.get_time_left() > 5*1000) {
     timer.reinit(5 * 1000);
     timer.start();
+  } else if (id == game_state) {
+    timer.reinit(2);
+    timer.start();
   }
 }));
+
+var BREAK_PAUSE_GAME = false;
+document.getElementById("break_pause").addEventListener("click", () => {
+  BREAK_PAUSE_GAME = document.getElementById("break_pause").checked;
+});
 
 
 const ROLES = {
@@ -491,6 +514,7 @@ function toProperCase(s)
   return s.toLowerCase().replace(/^(.)|\s(.)/g, 
           function($1) { return $1.toUpperCase(); });
 }
+// var round = "r1";
 function timer_loop() {
   // displaying the timer
   if (game_state === STATES.end) {
@@ -526,7 +550,7 @@ function timer_loop() {
       counters[ROLES.r1.seeker].seeker.lagori_broken.filter((n)=>n>0).length == 5 // 3. all 3 lagoris broken
       ) {
       var time_left = timer.get_time_left(); // store this time_left somewhere
-      counters[ROLES.r1.seeker].seeker.break_time = HALFMIN - time_left;
+      counters[ROLES.r1.seeker].seeker.break_time = Timer.ms2secStr(HALFMIN - time_left);
       place_times[0] = ONEMIN + time_left
       timer.reinit(ONEMIN + time_left);
       timer.start();
@@ -554,12 +578,21 @@ function timer_loop() {
 
       timer_text.classList.remove("flash");
       var time_left = timer.get_time_left();
+      counters[ROLES.r1.seeker].seeker.time_remaining = Timer.ms2secStr(time_left);
+      counters[ROLES.r1.hitter].hitter.time_remaining = Timer.ms2secStr(time_left);
+      if (counters[ROLES.r1.hitter].hitter.hit)
+        counters[ROLES.r1.seeker].seeker.place_time = "N/A";
+      else 
+        counters[ROLES.r1.seeker].seeker.place_time = Timer.ms2secStr(place_times[0] - time_left);
+        endAllRestarts();
+
       // store this time_left somewhere
       timer.reinit(ONEMIN);
       timer.start();
       game_state = STATES.r2_setting;
       set_state_board("r1-header", false); set_state_board("r1-build", false);
       set_state_board("r2-header", true); set_state_board("r2-setting", true); 
+      
     }
   } else if (game_state === STATES.r2_setting) {
     // timer runs out:
@@ -576,7 +609,7 @@ function timer_loop() {
       counters[ROLES.r2.seeker].seeker.lagori_broken.filter((n)=>n>0).length == 5 // 3. all 3 lagoris broken
       ) {
       var time_left = timer.get_time_left();
-      counters[ROLES.r2.seeker].seeker.break_time = HALFMIN - time_left;
+      counters[ROLES.r2.seeker].seeker.break_time = Timer.ms2secStr(HALFMIN - time_left);
       // store this time_left somewhere
       place_times[1] = ONEMIN + time_left;
       timer.reinit(ONEMIN + time_left);
@@ -602,11 +635,14 @@ function timer_loop() {
 
       // store this time_left somewhere
       var time_left = timer.get_time_left();
-      counters[ROLES.r2.seeker].seeker.time_remaining = time_left;
-      counters[ROLES.r2.hitter].hitter.time_remaining = time_left;
-      counters[ROLES.r2.seeker].seeker.place_time = 0;
-      
+      counters[ROLES.r2.seeker].seeker.time_remaining = Timer.ms2secStr(time_left);
+      counters[ROLES.r2.hitter].hitter.time_remaining = Timer.ms2secStr(time_left);
+      if (counters[ROLES.r2.hitter].hitter.hit)
+        counters[ROLES.r2.seeker].seeker.place_time = "N/A";
+      else 
+        counters[ROLES.r2.seeker].seeker.place_time = Timer.ms2secStr(place_times[0] - time_left);
 
+      endAllRestarts();
       game_state = STATES.end;
       set_state_board("r2-header", false); set_state_board("r2-build", false); 
     }
@@ -614,31 +650,142 @@ function timer_loop() {
 
 }
 
-function saveResult() {
+function win_determine() {
+  const blue_score = game_stats.blue.counters.seekerScore();
+  const red_score = game_stats.red.counters.seekerScore()
+  const blue_hit = game_stats.blue.counters.hitter_counters.hit;
+  const red_hit = game_stats.red.counters.hitter_counters.hit;
+  var blue_time_left = parseInt(game_stats.blue.counters.seeker_counters.time_left);
+  if (blue_time_left == NaN) blue_time_left = Infinity;
+  var red_time_left = parseInt(game_stats.red.counters.seeker_counters.time_left);
+  if (red_time_left == NaN) red_time_left = Infinity;
+  const blue_lagori_count = game_stats.blue.counters.seeker_counters.lagori_placed.filter((n)=>n>0).length;
+  const red_lagori_count = game_stats.blue.counters.seeker_counters.lagori_placed.filter((n)=>n>0).length;
+
+  if (blue_score > red_score) return "blue";
+  else if (red_score > blue_score) return "red";
+  else if (blue_hit && !red_hit) return "blue";
+  else if (red_hit && !blue_hit) return "red";
+  else if (blue_time_left > red_time_left) return "blue";
+  else if (red_time_left > blue_time_left) return "red";
+  else if (blue_lagori_count > red_lagori_count) return "blue";
+  else if (red_lagori_count > blue_lagori_count) return "red";
+  else return "tie";
+}
+
+function getResultJSON() {
   const result = {
-      createdAt: toIsoString(new Date()),
-      data: {
-          red: {
-              score: game_stats.red.counters.seekerScore(),
-              seeker: game_stats.red.counters.seekerCompiled(),
-              hitter: game_stats.red.counters.hitterCompiled(),
-              records: game_stats.red.records.map((obj) => obj.toString()),
-              win: false,
-          },
-          blue: {
-            score: game_stats.blue.counters.seekerScore(),
-            seeker: game_stats.blue.counters.seekerCompiled(),
-            hitter: game_stats.blue.counters.hitterCompiled(),
-            records: game_stats.blue.records.map((obj) => obj.toString()),
-            win: false,  
-          },
-      },
+    createdAt: toIsoString(new Date()),
+    data: {
+        red: {
+            score: game_stats.red.counters.seekerScore(),
+            seeker: game_stats.red.counters.seekerCompiled(),
+            hitter: game_stats.red.counters.hitterCompiled(),
+            records: game_stats.red.records.map((obj) => obj.toString()),
+            win: (()=>{if (win_determine() == "blue") return "yes"; else if (win_determine() == "tie") return "tie"; else return "no";})(),
+        },
+        blue: {
+          score: game_stats.blue.counters.seekerScore(),
+          seeker: game_stats.blue.counters.seekerCompiled(),
+          hitter: game_stats.blue.counters.hitterCompiled(),
+          records: game_stats.blue.records.map((obj) => obj.toString()),
+          win: (()=>{if (win_determine() == "red") return "yes"; else if (win_determine() == "tie") return "tie"; else return "no";})(),  
+        },
+    },
   };
-  saveToJSON(result, "result.json");
+  return JSON.stringify(result, null, 4)
+}
+function getResultExcel(team) {
+  const fields_key_list = [
+    "Balls Thrown",
+    "Lagoris Broken",
+    "Breakshot Time",
+    "Lagoris Picked",
+    "Lagoris Placed",
+    "Building Time",
+    "Score",
+    "Seeker Time Remaining",
+    "Built",
+    "Seeker Restarts",
+    "Seeker Restart Time",
+    "Seeker Violations",
+    "",
+    "Balls Collected",
+    "Balls Passed",
+    "Balls Shot",
+    "First Rack Time",
+    "Second Rack Time",
+    "Hitter Time Remaining",
+    "Hit",
+    "Hitter Restarts",
+    "Hitter Restart Time",
+    "Hitter Violations",
+    "",
+    "Win"
+  ]
+  const fields = {
+    "Balls Thrown": game_stats[team].counters.seeker_counters.balls_used,
+    "Lagoris Broken": game_stats[team].counters.seeker_counters.lagori_broken.filter((elm)=>(elm!=0)).length,
+    "Breakshot Time": game_stats[team].counters.seeker_counters.break_time,
+    "Lagoris Picked": game_stats[team].counters.seeker_counters.lagori_picked.filter((elm)=>(elm!=false)).length,
+    "Lagoris Placed": game_stats[team].counters.seeker_counters.lagori_placed.filter((elm)=>(elm!=false)).length,
+    "Building Time": game_stats[team].counters.seeker_counters.place_time,
+    "Seeker Time Remaining":	game_stats[team].counters.seeker_counters.time_remaining,
+    "Built": (() => {if (game_stats[team].counters.seeker_counters.built) return "yes"; else return "no";})(),
+    "Seeker Restarts": game_stats[team].counters.seeker_counters.restarts,
+    "Seeker Restart Time": 
+    (() => {if (game_stats[team].counters.seeker_counters.restarts > 0) {
+      game_stats[team].counters.seeker_counters.restart_times.reduce((totalTime, time) => totalTime += parseFloat(time))
+        / game_stats[team].counters.seeker_counters.restarts;
+    } else return NaN;
+      })(),
+    "Seeker Violations": game_stats[team].counters.seeker_counters.violations,
+    "":"",
+    "Balls Collected": game_stats[team].counters.hitter_counters.balls_collected,
+    "Balls Passed": game_stats[team].counters.hitter_counters.balls_passed,
+    "Balls Shot": game_stats[team].counters.hitter_counters.balls_thrown,
+    "First Rack Time": game_stats[team].counters.hitter_counters.balls_collected_time[0],
+    "Second Rack Time": game_stats[team].counters.hitter_counters.balls_collected_time[1],
+    "Hitter Time Remaining": game_stats[team].counters.hitter_counters.time_remaining,
+    "Hit": game_stats[team].counters.hitter_counters.hit,
+    "Hitter Restarts": game_stats[team].counters.hitter_counters.restarts,
+    "Hitter Restart Time": 
+    (() => {if (game_stats[team].counters.hitter_counters.restarts > 0) {
+      game_stats[team].counters.hitter_counters.restart_times.reduce((totalTime, time) => totalTime += parseFloat(time))
+        / game_stats[team].counters.hitter_counters.restarts;
+    } else return NaN;
+      })(),
+    "Hitter Violations": game_stats[team].counters.hitter_counters.violations,
+    "Win": (()=>{if (win_determine() == team) return "yes"; else if (win_determine() == "tie") return "tie"; else return "no";})(),
+    "Score": game_stats[team].counters.seekerScore()
+  }
+  
+  return "<table><tr>"+
+  fields_key_list.map((elm) => `<td>${elm}</td>`).join("") +"</tr><tr>" +
+  fields_key_list.map((elm) => `<td>${fields[elm]}</td>`).join("") + "</tr></table>";
+}
+function saveResult() {
+  saveToJSON(getResultJSON(), "result.json");
 }
 
 document.getElementById("btn_save").addEventListener("click", () => {
   // alert("hi");
   saveResult();
-})
-// let main_loop_id = setInterval(main_loop, 8);
+});
+
+document.getElementById("btn_convert").addEventListener("click", () => {
+
+  
+  document.getElementById("result_output").innerHTML = `
+  <p style="font-weight:700;font-size:22px;">Raw JSON</p>
+  <div style="font-size:14px;padding:5px 5px;background-color:rgba(50,50,50,.1);">${getResultJSON()}</div>
+  <p style="font-weight:700;font-size:22px;">Red Team Excel</p>
+  <div style="font-size:14px;padding:5px 5px;background-color:rgba(200,0,0,.1);">${getResultExcel("red")}</div>
+  <div style="font-size:14px;padding:5px 5px;background-color:rgba(200,0,0,.1);white-space: pre-line">${game_stats.red.records.map((obj) => obj.toString()).join("\n")}</div>
+  <p style="font-weight:700;font-size:22px;">Blue Team Excel</p>
+  <div style="font-size:14px;padding:5px 5px;background-color:rgba(0,0,200,.1);">${getResultExcel("blue")}</div>
+  <div style="font-size:14px;padding:5px 5px;background-color:rgba(0,0,200,.1);white-space: pre-line;">${game_stats.blue.records.map((obj) => obj.toString()).join("\n")}</div>
+
+  `
+});
+
